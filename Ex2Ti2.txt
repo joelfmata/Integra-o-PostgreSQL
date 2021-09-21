@@ -1,0 +1,39 @@
+public class X{
+
+}
+
+public class Principal {
+	public String Listar(String n) {
+		return n;
+		
+	} 
+
+public String Excluir(String n) {
+	String S= "";
+	return S;
+		
+	} 
+
+public void Atualizar() {
+	
+} 
+public void Sair() {
+	
+} 
+}
+ 
+ 
+public class DAO {
+    
+return X;
+
+}
+ 
+CREATE TABLE IF NOT EXISTS public."X"
+(
+)
+ 
+TABLESPACE pg_default;
+ 
+ALTER TABLE public."X"
+    OWNER to postgres;
