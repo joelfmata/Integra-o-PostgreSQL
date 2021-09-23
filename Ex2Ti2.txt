@@ -1,36 +1,3 @@
-import java.util.List;
-
-public class X{
-
-}
-
-public class Principal {
-	public String Listar(String n) {
-		return n;
-		
-	} 
-
-public String Excluir(String n) {
-	String S= "";
-	return S;
-		
-	} 
-
-public void Atualizar() {
-	
-} 
-public void Sair() {
-	
-} 
-}
- 
- 
-public class DAO {
-    
-return X;
-
-}
- 
 CREATE TABLE IF NOT EXISTS public."X"
 (
 )
@@ -39,3 +6,196 @@ TABLESPACE pg_default;
  
 ALTER TABLE public."X"
     OWNER to postgres;
+
+package com.ti2cc;
+import java.sql.*;
+import java.util.Scanner;
+import com.ti2cc.DAO;
+import com.ti2cc.Usuario;
+
+public class X{
+
+} 
+ 
+public class DAO {
+	private Connection conexao;
+	
+	public DAO() {
+		conexao = null;
+	}
+	
+	public boolean conectar() {
+		String driverName = "org.postgresql.Driver";                    
+		String serverName = "localhost";
+		String mydatabase = "teste";
+		int porta = 5432;
+		String url = "jdbc:postgresql://" + serverName + ":" + porta +"/" + mydatabase;
+		String username = "ti2cc";
+		String password = "ti@cc";
+		boolean status = false;
+
+		try {
+			Class.forName(driverName);
+			conexao = DriverManager.getConnection(url, username, password);
+			status = (conexao == null);
+			System.out.println("ConexÃ£o efetuada com o postgres!");
+		} catch (ClassNotFoundException e) { 
+			System.err.println("ConexÃ£o NÃƒO efetuada com o postgres -- Driver nÃ£o encontrado -- " + e.getMessage());
+		} catch (SQLException e) {
+			System.err.println("ConexÃ£o NÃƒO efetuada com o postgres -- " + e.getMessage());
+		}
+
+		return status;
+	}
+	
+	public boolean close() {
+		boolean status = false;
+		
+		try {
+			conexao.close();
+			status = true;
+		} catch (SQLException e) {
+			System.err.println(e.getMessage());
+		}
+		return status;
+	}
+	
+	public boolean inserirUsuario(Usuario usuario) {
+		boolean status = false;
+		try {  
+			Statement st = conexao.createStatement();
+			st.executeUpdate("INSERT INTO usuario (codigo, login, senha, sexo) "
+					       + "VALUES ("+usuario.getCodigo()+ ", '" + usuario.getLogin() + "', '"  
+					       + usuario.getSenha() + "', '" + usuario.getSexo() + "');");
+			st.close();
+			status = true;
+		} catch (SQLException u) {  
+			throw new RuntimeException(u);
+		}
+		return status;
+	}
+	
+	public boolean atualizarUsuario(Usuario usuario) {
+		boolean status = false;
+		try {  
+			Statement st = conexao.createStatement();
+			String sql = "UPDATE usuario SET login = '" + usuario.getLogin() + "', senha = '"  
+				       + usuario.getSenha() + "', sexo = '" + usuario.getSexo() + "'"
+					   + " WHERE codigo = " + usuario.getCodigo();
+			st.executeUpdate(sql);
+			st.close();
+			status = true;
+		} catch (SQLException u) {  
+			throw new RuntimeException(u);
+		}
+		return status;
+	}
+	
+	public boolean excluirUsuario(int codigo) {
+		boolean status = false;
+		try {  
+			Statement st = conexao.createStatement();
+			st.executeUpdate("DELETE FROM usuario WHERE codigo = " + codigo);
+			st.close();
+			status = true;
+		} catch (SQLException u) {  
+			throw new RuntimeException(u);
+		}
+		return status;
+	}
+	
+	
+	public Usuario[] getUsuarios() {
+		Usuario[] usuarios = null;
+		
+		try {
+			Statement st = conexao.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_READ_ONLY);
+			ResultSet rs = st.executeQuery("SELECT * FROM usuario");		
+	         if(rs.next()){
+	             rs.last();
+	             usuarios = new Usuario[rs.getRow()];
+	             rs.beforeFirst();
+
+	             for(int i = 0; rs.next(); i++) {
+	                usuarios[i] = new Usuario(rs.getInt("codigo"), rs.getString("login"), 
+	                		                  rs.getString("senha"), rs.getString("sexo").charAt(0));
+	             }
+	          }
+	          st.close();
+		} catch (Exception e) {
+			System.err.println(e.getMessage());
+		}
+		return usuarios;
+	}
+	
+}
+
+public class Principal {
+	//Listar usuários;
+	public static String listar() {
+		usuarios = dao.getUsuarios();
+		System.out.println("==== Mostrar usuÃ¡rios === ");		
+		for(int i = 0; i < usuarios.length; i++) {
+			System.out.println(usuarios[i].toString());
+		}
+		String saida = "Processo terminado";
+		return saida;
+	}
+	//Inserir usuários
+	public static String inserir() {
+		Usuario usuario = new Usuario(11, "pablo", "pablo",'M');
+		if(dao.inserirUsuario(usuario) == true) {
+			System.out.println("InserÃ§Ã£o com sucesso -> " + usuario.toString());
+		}
+		String saida = "Processo terminado";
+		return saida;
+	}
+	//Excluir usuário
+	public static String excluir() {
+		dao.excluirUsuario(usuario.getCodigo());
+		String saida = "Processo terminado";
+		return saida;
+	}
+	//atualizar usuário
+	public static String atualizar(){
+		usuario.setSenha("nova senha");
+		dao.atualizarUsuario(usuario);
+		String saida = "Processo terminado";
+		return saida;
+	}
+	
+	public static void main(String[] args) {
+		
+		DAO dao = new DAO();
+		
+		dao.conectar();
+		System.out.println("====Menu===");
+		System.out.println("1) Listar");
+		System.out.println("2) Inserir");
+		System.out.println("3) Excluir");
+		System.out.println("4) Atualizar");
+		System.out.println("5) Sair");
+		int op = 0;//opção selecionada;
+		while(op != 5) {
+			System.out.println("Digite um número: ");
+			op = sc.nextInt();
+			if(op == 1) {
+				System.out.println(listar());
+			}
+			else if(op == 2) {
+				System.out.println(inserir());
+			}
+			else if(op == 3) {
+				System.out.println(excluir());
+			}
+			else if(op == 4) {
+				System.out.println(atualizar());
+			}
+			else if(op == 5) {
+				System.out.println("Saindo.");
+			}
+			else {System.out.println("Erro");}
+		}
+		dao.close();
+	}
+} 
